@@ -1,8 +1,9 @@
 async function main() {
+    const tune = await fetch("./test.json").then((r) => r.json());
     let done = false;
     document.body.addEventListener("click", () => {
         if (!done) {
-            go(() => (done = false));
+            go(tune, () => (done = false));
             done = true;
         }
     });
@@ -16,36 +17,43 @@ const mk_osc = (ctx, freq = 220, type = "square") => {
     return osc;
 };
 
-const mk_tri = (ctx, dest) => {
-    const o1 = mk_osc(ctx, 55 + 1);
-    const o2 = mk_osc(ctx, 55 - 1);
-    const o3 = mk_osc(ctx, 110, "sine");
+const mk_syn = (ctx, dest) => {
+    const o1 = mk_osc(ctx, 220, "sine");
+    const o2 = mk_osc(ctx, 220);
 
-    o1.connect(dest);
-    o2.connect(dest);
-    o3.connect(dest);
+    const env = ctx.createGain();
+    env.connect(dest);
+    env.gain.value = 0;
+
+    o1.connect(env);
+    o2.connect(env);
 
     return {
         start: () => {
             o1.start();
             o2.start();
-            o3.start();
+            env.gain.value = 0;
         },
-        freq: (time, f) => {
-            o1.frequency.setValueAtTime(f / 2, time - 0.3);
-            o1.frequency.exponentialRampToValueAtTime(f - 1, time);
-            o2.frequency.setValueAtTime(f + 1, time);
-            o3.frequency.setValueAtTime(f / 2, time);
+        play: (time, f, duration = 0.5) => {
+            env.gain.cancelScheduledValues(time);
+            env.gain.setValueAtTime(0, time);
+            env.gain.linearRampToValueAtTime(0.3, time + 0.1);
+            env.gain.linearRampToValueAtTime(0, time + duration);
+
+            //o1.frequency.cancelScheduledValues(next);
+            o1.frequency.setValueAtTime(f * 0.995, time);
+            //o1.frequency.exponentialRampToValueAtTime(f - 1, next + duration);
+            o2.frequency.setValueAtTime(f * 1.005, time);
+            //     o3.frequency.setValueAtTime(f / 2, next + duration);
         },
         stop: () => {
             o1.stop();
             o2.stop();
-            o3.stop();
         },
     };
 };
 
-async function go(onDone) {
+async function go(tune, onDone) {
     if (!window.AudioContext) {
         return;
     }
@@ -55,21 +63,25 @@ async function go(onDone) {
     master.connect(ctx.destination);
     master.gain.volume = 0.1;
 
-    const tr = mk_tri(ctx, master);
     const t = ctx.currentTime;
-    tr.freq(t + 0.5, 220);
-    tr.freq(t + 1, 100);
-    tr.freq(t + 1.5, 180);
-    tr.freq(t + 2, 100);
-    tr.freq(t + 2.5, 80);
+    const syns = [];
+    tune.tracks.forEach((trk, i) => {
+        const syn = mk_syn(ctx, master);
+        syns.push(syn);
+        trk.forEach((v) => {
+            const tick = 0.5 + ((v.tick - 400) / 100) * 1;
+            console.log(v.tick, tick);
+            syn.play(t + tick, i * (220 / 3) + 220, v.duration * 0.01);
+        });
+    });
 
-    tr.start();
+    syns.forEach((s) => s.start());
 
     setTimeout(() => {
-        tr.stop();
+        syns.forEach((s) => s.stop());
         setTimeout(() => {
             ctx.close();
             onDone();
         }, 0);
-    }, 3300);
+    }, 8000);
 }
