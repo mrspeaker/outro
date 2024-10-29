@@ -1,0 +1,15 @@
+{
+    "manifest_version": 2,
+    "name": "outro",
+    "version": "0.1",
+    "description": "you'll see",
+    "icons": {
+        "48": "icons/outro-48.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://outlook.office.com/*"],
+            "js": ["outro.js"]
+        }
+    ]
+}

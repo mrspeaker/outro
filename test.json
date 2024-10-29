@@ -1,0 +1,91 @@
+{
+  "track_length": 1440,
+  "tracks": [
+    [
+      {
+        "tick": 660,
+        "duration": 13
+      },
+      {
+        "tick": 660,
+        "duration": 58
+      },
+      {
+        "tick": 780,
+        "duration": 58
+      },
+      {
+        "tick": 840,
+        "duration": 28
+      }
+    ],
+    [
+      {
+        "tick": 540,
+        "duration": 58
+      },
+      {
+        "tick": 660,
+        "duration": 13
+      },
+      {
+        "tick": 780,
+        "duration": 28
+      },
+      {
+        "tick": 870,
+        "duration": 28
+      }
+    ],
+    [
+      {
+        "tick": 480,
+        "duration": 58
+      },
+      {
+        "tick": 660,
+        "duration": 13
+      },
+      {
+        "tick": 840,
+        "duration": 28
+      }
+    ],
+    [
+      {
+        "tick": 450,
+        "duration": 58
+      },
+      {
+        "tick": 660,
+        "duration": 13
+      },
+      {
+        "tick": 720,
+        "duration": 58
+      },
+      {
+        "tick": 900,
+        "duration": 28
+      }
+    ],
+    [
+      {
+        "tick": 480,
+        "duration": 58
+      },
+      {
+        "tick": 660,
+        "duration": 13
+      },
+      {
+        "tick": 960,
+        "duration": 238
+      },
+      {
+        "tick": 960,
+        "duration": 58
+      }
+    ]
+  ]
+}
