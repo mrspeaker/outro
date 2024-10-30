@@ -9,7 +9,7 @@
     "content_scripts": [
         {
             "matches": ["*://outlook.office.com/*"],
-            "js": ["outro.js"]
+            "js": ["syn.js", "outro.js"]
         }
     ]
 }

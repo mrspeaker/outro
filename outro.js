@@ -1,4 +1,4 @@
-console.log("outro...");
+console.log("outro...", play_tune);
 setTimeout(go, 2000);
 
 //test();
@@ -58,6 +58,17 @@ function go() {
         return;
     }
 
-    const song = extract_cal_entries(view);
-    console.log("Da song:", JSON.stringify(song));
+    const navBar = document.querySelector(
+        "[data-app-section='CalendarModuleSurfaceNavigationBar']",
+    );
+    const button = document.createElement("input");
+    button.type = "button";
+    button.addEventListener("click", () => {
+        const song = extract_cal_entries(view);
+        play_tune(song);
+    });
+    button.value = "play";
+    button.text = "play";
+
+    navBar.appendChild(button);
 }
