@@ -17,7 +17,6 @@ const mk_note = (tick, duration) => ({ tick, duration });
 function extract_cal_entries(view) {
     // TOOD: reliable way to get rows
     const rows = [...view.querySelectorAll("div > .L7luy")];
-    console.log("num rows", rows.length);
 
     const song = mk_song(view.offsetHeight);
 
@@ -28,7 +27,7 @@ function extract_cal_entries(view) {
         song.tracks.push(track);
 
         // TOOD: reliable way to get entries
-        const entries = r.querySelectorAll(":scope > div > div > div");
+        const entries = r.querySelectorAll(":scope > div > div > div > div");
         entries.forEach((e) => {
             track.push(mk_note(e.offsetTop, e.offsetHeight));
         });

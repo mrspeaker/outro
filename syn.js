@@ -1,3 +1,26 @@
+function get_note_freq(note, octave) {
+    const NOTES = [
+        "c",
+        "c#",
+        "d",
+        "d#",
+        "e",
+        "f",
+        "f#",
+        "g",
+        "g#",
+        "a",
+        "a#",
+        "b",
+    ];
+    return (
+        440 *
+        Math.pow(
+            Math.pow(2, 1 / NOTES.length),
+            octave * 12 + NOTES.indexOf(note),
+        )
+    );
+}
 const mk_osc = (ctx, freq = 220, type = "square") => {
     const osc = ctx.createOscillator();
     osc.type = type;
@@ -6,8 +29,8 @@ const mk_osc = (ctx, freq = 220, type = "square") => {
 };
 
 const mk_syn = (ctx, dest) => {
-    const o1 = mk_osc(ctx, 220, "sawtooth");
-    const o2 = mk_osc(ctx, 220);
+    const o1 = mk_osc(ctx, 220, "square");
+    const o2 = mk_osc(ctx, 220, "square");
 
     const env = ctx.createGain();
     env.connect(dest);
@@ -25,13 +48,23 @@ const mk_syn = (ctx, dest) => {
         play: (time, f, duration = 0.5) => {
             env.gain.cancelScheduledValues(time);
             env.gain.setValueAtTime(0, time);
-            env.gain.linearRampToValueAtTime(0.3, time + 0.1);
+            env.gain.linearRampToValueAtTime(0.3, time + 0.01);
             env.gain.linearRampToValueAtTime(0, time + duration);
 
             //o1.frequency.cancelScheduledValues(next);
             o1.frequency.setValueAtTime(f * 0.995, time);
+            o1.frequency.setValueAtTime(f * 0.995 * 2.0, time + duration * 0.5);
+            o1.frequency.setValueAtTime(
+                f * 0.995 * 3.0,
+                time + duration * 0.75,
+            );
             //o1.frequency.exponentialRampToValueAtTime(f - 1, next + duration);
             o2.frequency.setValueAtTime(f * 1.005, time);
+            o2.frequency.setValueAtTime(f * 1.005 * 2.0, time + duration * 0.5);
+            o2.frequency.setValueAtTime(
+                f * 1.005 * 3.0,
+                time + duration / 0.75,
+            );
         },
         stop: () => {
             o1.stop();
@@ -56,9 +89,18 @@ async function play_tune(tune, onDone) {
         const syn = mk_syn(ctx, master);
         syns.push(syn);
         trk.forEach((v) => {
-            const tick = 0.5 + ((v.tick - 400) / 100) * 0.5;
-            console.log(v.tick, tick);
-            syn.play(t + tick, i * (220 / 5) + 220, v.duration * 0.01);
+            const tick = 0.5 + (v.tick / 100) * 0.5;
+            const f0 = i * (220 / 5) + 220;
+            const f = [
+                ["c", -1],
+                ["g", -1],
+                ["e", -1],
+                ["b", 0],
+                ["c", 0],
+            ][i];
+            const ff = get_note_freq(f[0], f[1]);
+            const duration = v.duration * 0.01;
+            syn.play(t + tick, ff, duration);
         });
     });
 
